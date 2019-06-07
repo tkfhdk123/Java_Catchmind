@@ -26,15 +26,15 @@ public class login extends JFrame implements ActionListener {
 		c.add(panel_nickname);
 		
 		pack();
-		label_nickname = new JLabel("´Ğ³×ÀÓ");
-		label_ip = new JLabel("ipÁÖ¼Ò");
-		label_nickname.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 13));
-		label_ip.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 13));
+		label_nickname = new JLabel("ë‹‰ë„¤ì„");
+		label_ip = new JLabel("ipì£¼ì†Œ");
+		label_nickname.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 13));
+		label_ip.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 13));
 		txt_nickname = new JTextField(15);
 		txt_ip = new JTextField(15);
 		
-		btn_login = new JButton("·Î±×ÀÎ");
-		btn_exit = new JButton("Á¾·á");
+		btn_login = new JButton("ë¡œê·¸ì¸");
+		btn_exit = new JButton("ì¢…ë£Œ");
 		
 		panel_nickname.setBackground(new Color(247,243,222));
 		panel_ip.setBackground(new Color(247,243,222));
@@ -76,18 +76,18 @@ public class login extends JFrame implements ActionListener {
 		panel_ip.add(label_ip);
 		panel_ip.add(txt_ip);
 		
-		//bottom ¹öÆ° ¼³Á¤
-		btn_login.setFocusPainted(false); //Æ÷Ä¿½º Ç¥½Ã
+		//bottom ë²„íŠ¼ ì„¤ì •
+		btn_login.setFocusPainted(false); //í¬ì»¤ìŠ¤ í‘œì‹œ
 		btn_exit.setFocusPainted(false);
 		btn_login.setBackground(Color.BLACK); 
 		btn_exit.setBackground(Color.BLACK);
 		btn_login.setForeground(Color.WHITE);
 		btn_exit.setForeground(Color.WHITE);
 		
-		btn_login.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 13));
-		btn_exit.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 13));
+		btn_login.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 13));
+		btn_exit.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 13));
 		
-		//btn_login : Á¢¼Ó¹öÆ°, btn_exit : Á¾·á¹öÆ°
+		//btn_login : ì ‘ì†ë²„íŠ¼, btn_exit : ì¢…ë£Œë²„íŠ¼
 		panel_button.add(btn_login);
 		panel_button.add(btn_exit);
 		btn_login.addActionListener(this);
@@ -105,25 +105,25 @@ public class login extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e){ 
 		if(e.getSource() == btn_login){
 			if(txt_nickname.getText().equals("")){
-				JOptionPane.showMessageDialog(null, "´Ğ³×ÀÓÀ» ÀÔ·ÂÇØ ÁÖ¼¼¿ä", "ERROR!", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "ë‹‰ë„¤ì„ì„ ì…ë ¥í•´ ì£¼ì„¸ìš”", "ERROR!", JOptionPane.WARNING_MESSAGE);
 			}else if(txt_ip.getText().equals("")){
-				JOptionPane.showMessageDialog(null, "IP ÁÖ¼Ò¸¦ ÀÔ·ÂÇØ ÁÖ¼¼¿ä", "ERROR!", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "IP ì£¼ì†Œë¥¼ ì…ë ¥í•´ ì£¼ì„¸ìš”", "ERROR!", JOptionPane.WARNING_MESSAGE);
 			}else if(txt_nickname.getText().trim().length() >=5){
-				JOptionPane.showMessageDialog(null, "´Ğ³×ÀÓÀº 4±ÛÀÚ±îÁö¸¸ ÀÔ·ÂÇÒ¼ö ÀÖ½À´Ï´Ù", "ERROR!", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, "ë‹‰ë„¤ì„ì€ 4ê¸€ìê¹Œì§€ë§Œ ì…ë ¥í• ìˆ˜ ìˆìŠµë‹ˆë‹¤", "ERROR!", JOptionPane.WARNING_MESSAGE);
 				txt_nickname.setText("");
 			}else{
-				nickname = txt_nickname.getText().trim(); //trimÀ¸·Î °ø¹é»©°í ÀúÀå - isempty¸¦ ÀÌ¿ëÇØ¼­µµ ¸¸µé ¼ö ÀÖÀ½
-				String temp = txt_ip.getText(); //Á¤±Ô½Ä -- IP¸¦ ¹Ş¾Æ¿È.
+				nickname = txt_nickname.getText().trim(); //trimìœ¼ë¡œ ê³µë°±ë¹¼ê³  ì €ì¥ - isemptyë¥¼ ì´ìš©í•´ì„œë„ ë§Œë“¤ ìˆ˜ ìˆìŒ
+				String temp = txt_ip.getText(); //ì •ê·œì‹ -- IPë¥¼ ë°›ì•„ì˜´.
 				if(temp.matches("(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)")){
 					ip = temp;
-					JOptionPane.showMessageDialog(null, "·Î±×ÀÎ ¼º°ø!", "JAVA CatchMind LOGIN", JOptionPane.INFORMATION_MESSAGE);
-					btn_login.setEnabled(false); //¹öÆ° ºñÈ°¼ºÈ­
+					JOptionPane.showMessageDialog(null, "ë¡œê·¸ì¸ ì„±ê³µ!", "JAVA CatchMind LOGIN", JOptionPane.INFORMATION_MESSAGE);
+					btn_login.setEnabled(false); //ë²„íŠ¼ ë¹„í™œì„±í™”
 					txt_nickname.setEnabled(false);
 					txt_ip.setEnabled(false);
 					setVisible(false);
 					client client = new client();
 				}else{
-					JOptionPane.showMessageDialog(null, "IP ÁÖ¼Ò¸¦ Á¤È®ÇÏ°Ô ÀÔ·ÂÇØ ÁÖ¼¼¿ä! ", "ERROR!", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "IP ì£¼ì†Œë¥¼ ì •í™•í•˜ê²Œ ì…ë ¥í•´ ì£¼ì„¸ìš”! ", "ERROR!", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		}else if(e.getSource() == btn_exit){
@@ -136,5 +136,3 @@ public class login extends JFrame implements ActionListener {
 		login.init();
 	}
 }
-
-

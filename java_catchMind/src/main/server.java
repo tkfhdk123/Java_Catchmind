@@ -22,6 +22,8 @@ public class server extends JFrame implements ActionListener{
 	ServerSocket ss;
 	Socket s;
 	int port=7777;
+	int readyPlayer;
+	String sentence="";
 	public static final int MAX_CLIENT=4;
 	
 	public void init() {
@@ -46,11 +48,11 @@ public class server extends JFrame implements ActionListener{
 		panel_main.add(panel_btn);
 		panel_btn.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		serverstart_btn = new JButton(" ¼­¹ö ½ÃÀÛ ");
+		serverstart_btn = new JButton(" ì„œë²„ ì‹œì‘ ");
 		serverstart_btn.setHorizontalTextPosition(SwingConstants.CENTER);
 		serverstart_btn.setPreferredSize(new Dimension(120, 40));
 		serverstart_btn.setFocusPainted(false);
-		serverstart_btn.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 16));
+		serverstart_btn.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 16));
 		serverstart_btn.setAlignmentX(Component.CENTER_ALIGNMENT);
 		serverstart_btn.setForeground(Color.WHITE);
 		serverstart_btn.setBackground(Color.DARK_GRAY);
@@ -58,11 +60,11 @@ public class server extends JFrame implements ActionListener{
 		panel_btn.add(serverstart_btn);
 		serverstart_btn.addActionListener(this);
 		
-		serverclose_btn = new JButton(" ¼­¹ö Á¾·á ");
+		serverclose_btn = new JButton(" ì„œë²„ ì¢…ë£Œ ");
 		serverclose_btn.setHorizontalTextPosition(SwingConstants.CENTER);
 		serverclose_btn.setPreferredSize(new Dimension(120, 40));
 		serverclose_btn.setFocusPainted(false);
-		serverclose_btn.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 16));
+		serverclose_btn.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.BOLD, 16));
 		serverclose_btn.setAlignmentX(Component.CENTER_ALIGNMENT);
 		serverclose_btn.setForeground(Color.WHITE);
 		serverclose_btn.setBackground(Color.DARK_GRAY);
@@ -77,7 +79,7 @@ public class server extends JFrame implements ActionListener{
 		panel_main.add(serverstatus_label);
 		serverstatus_label.setHorizontalTextPosition(SwingConstants.CENTER);
 		serverstatus_label.setHorizontalAlignment(SwingConstants.CENTER);
-		serverstatus_label.setFont(new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 20));
+		serverstatus_label.setFont(new Font("ë‚˜ëˆ”ë°”ë¥¸ê³ ë”•", Font.PLAIN, 20));
 		
 		panel_textarea = new JPanel();
 		panel_main.add(panel_textarea);
@@ -98,7 +100,7 @@ public class server extends JFrame implements ActionListener{
 		panel_btn.setBackground(new Color(247, 243, 222));
 	}
 	
-	public void actionPerformed(ActionEvent e){ // '¼­¹ö ½ÃÀÛ & Á¾·á' ¹öÆ°
+	public void actionPerformed(ActionEvent e){ // 'ì„œë²„ ì‹œì‘ & ì¢…ë£Œ' ë²„íŠ¼
 		if(e.getSource() == serverstart_btn){
 			new Thread(){
 				public void run() {
@@ -106,7 +108,7 @@ public class server extends JFrame implements ActionListener{
 						Collections.synchronizedMap(clientList);
 						ss = new ServerSocket(port);
 						serverstatus_label.setText("[ Server Started ]");
-						textarea.append("[ ¼­¹ö°¡ ½ÃÀÛµÇ¾ú½À´Ï´Ù ]" + "\n");
+						textarea.append("[ ì„œë²„ê°€ ì‹œì‘ë˜ì—ˆìŠµë‹ˆë‹¤ ]" + "\n");
 						serverstart_btn.setEnabled(false);
 						serverclose_btn.setEnabled(true);
 						while(true){
@@ -123,12 +125,12 @@ public class server extends JFrame implements ActionListener{
 				}
 			}.start();
 		}else if(e.getSource() == serverclose_btn){
-			int select = JOptionPane.showConfirmDialog(null, "¼­¹ö¸¦ Á¤¸» Á¾·áÇÏ½Ã°Ú½À´Ï±î?", "JAVA CatchMind Server", JOptionPane.OK_CANCEL_OPTION);
+			int select = JOptionPane.showConfirmDialog(null, "ì„œë²„ë¥¼ ì •ë§ ì¢…ë£Œí•˜ì‹œê² ìŠµë‹ˆê¹Œ?", "JAVA CatchMind Server", JOptionPane.OK_CANCEL_OPTION);
 			try{
 				if(select == JOptionPane.YES_OPTION){
 					ss.close();
 					serverstatus_label.setText("[ Server Closed ]");
-					textarea.append("[ ¼­¹ö°¡ Á¾·áµÇ¾ú½À´Ï´Ù ]" + "\n");
+					textarea.append("[ ì„œë²„ê°€ ì¢…ë£Œë˜ì—ˆìŠµë‹ˆë‹¤ ]" + "\n");
 					serverstart_btn.setEnabled(true);
 					serverclose_btn.setEnabled(false);
 				}
@@ -136,6 +138,63 @@ public class server extends JFrame implements ActionListener{
 		}
 	}
 	
+	public void showSystemMsg(String msg) {
+		Iterator<String> it= clientList.keySet().iterator();
+		while(it.hasNext()) {
+			try {
+				DataOutputStream dos = clientList.get(it.next());	
+				dos.writeUTF(msg);
+				dos.flush();
+			}
+			catch(IOException io) {}
+		}
+	}
+	
+	class Quiz extends Thread{
+		int x = 0;
+		BufferedReader br;
+		
+		public void run() {
+			Random r = new Random();
+			int num = r.nextInt(30);
+			try {
+				FileReader fr = new FileReader("wordcollection.txt");
+				br = new BufferedReader(fr);
+				for(int i=0; i<=x; i++) {
+					sentence = br.readLine();
+				}
+			}catch(IOException ie) {}
+		}
+	}
+	
+	class Timer extends Thread{
+		long firstTime = System.currentTimeMillis();
+		public void run() {
+			try {
+				while(gamestart == true) {
+					sleep(10);
+					long currentTime = System.currentTimeMillis() - firstTime;
+					if(toTime(firstTime).equals("00:00")) {
+						showSystemMsg("_GmEnd");
+						readyPlayer = 0;
+						gamestart = false;
+						break;
+					}
+					else if(readyPlayer == 0) {
+						break;
+					}
+				}
+			}catch(Exception e) {}
+		}
+		
+		String toTime(long time){
+			int m = (int)(3-(time / 1000.0 / 60.0));
+			int s = (int)(60-(time % (1000.0 * 60) / 1000.0));
+			//int ms = (int)(100-(time % 1000 / 10.0));
+			return String.format("%02d : %02d ", m, s);
+		}
+	}
+
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
