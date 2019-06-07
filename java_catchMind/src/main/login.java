@@ -1,10 +1,11 @@
 package main;
 
-import java.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
+
+
 import javax.swing.*;
-import javax.swing.border.*;
 
 
 public class login extends JFrame implements ActionListener {
@@ -41,7 +42,7 @@ public class login extends JFrame implements ActionListener {
 		panel_button.setBackground(new Color(247,243,222));
 		
 		pallete = new JLabel(new ImageIcon("image\\color-palette.png"));
-		eraser = new JLabel(new ImageIcon("image\\eraser.png"));
+		eraser = new JLabel(new ImageIcon("image\\eraser2.png"));
 		
 		pallete.setBounds(15, 60, 50, 47);
 		pallete.setOpaque(true);
@@ -68,6 +69,8 @@ public class login extends JFrame implements ActionListener {
 
 		txt_ip.setForeground(Color.BLACK);
 		txt_ip.setBackground(new Color(247,243,222));
+	
+		
 		panel_nickname.add(label_nickname);
 		panel_nickname.add(txt_nickname);
 		
@@ -92,6 +95,7 @@ public class login extends JFrame implements ActionListener {
 		panel_button.add(btn_exit);
 		btn_login.addActionListener(this);
 		btn_exit.addActionListener(this);
+		
 
 		setVisible(true);
 		setTitle("LOGIN");
@@ -101,8 +105,9 @@ public class login extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	
 	public void actionPerformed(ActionEvent e){ 
+		
+		
 		if(e.getSource() == btn_login){
 			if(txt_nickname.getText().equals("")){
 				JOptionPane.showMessageDialog(null, "닉네임을 입력해 주세요", "ERROR!", JOptionPane.WARNING_MESSAGE);
@@ -116,7 +121,7 @@ public class login extends JFrame implements ActionListener {
 				String temp = txt_ip.getText(); //정규식 -- IP를 받아옴.
 				if(temp.matches("(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)")){
 					ip = temp;
-					JOptionPane.showMessageDialog(null, "로그인 성공!", "JAVA CatchMind LOGIN", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "             로그인 성공!", "JAVA CatchMind LOGIN", JOptionPane.INFORMATION_MESSAGE);
 					btn_login.setEnabled(false); //버튼 비활성화
 					txt_nickname.setEnabled(false);
 					txt_ip.setEnabled(false);
