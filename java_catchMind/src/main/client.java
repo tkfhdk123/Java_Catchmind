@@ -5,14 +5,13 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.*;
 
 public class client extends JFrame implements ActionListener{
 	JPanel contentPane, panel_main, panel_chat, panel_exam, panel_canvas, panel_option, panel_timer, panel_readyexit;
-	JButton btn_ready, btn_exit, btn_c1, btn_c2, btn_c3, btn_c4, btn_c5, btn_erase, btn_eraseAll, btn_GG;
+	JButton btn_ready, btn_exit, btn_c1, btn_c2, btn_c3, btn_c4, btn_c5, btn_erase, btn_eraseAll, btn_enter;
 	JLabel label_canvas, label_exam, label_exam_nickname, label_timer, label_player1, label_player2, label_player3, label_player4;
 	Label label_player1_nickname, label_player2_nickname, label_player3_nickname, label_player4_nickname;
 	Label label_player1_score, label_player2_score, label_player3_score, label_player4_score;
@@ -23,15 +22,15 @@ public class client extends JFrame implements ActionListener{
 	Color color;
 	Graphics g;
 	Graphics2D g2d;
+	public static boolean bool = false;
 	
-	int port = 7777;
+	int port = 8888;
 	String playerName, playerScore, playerIdx;
 	boolean gameStart, auth;
-	int game_number = 0;
 	
 	public client(){
 		setFont(new Font("나눔바른고딕", Font.PLAIN, 13)); //글꼴 : 나눔바른고딕, 폰트 : 평평하게, 크기 : 13
-		setTitle("JAVA CatchMind Client Ver.181017"); //제목
+		setTitle("JAVA Catchmind project - 민수, 나연 , ㅈㅈ -"); //제목
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //끌때 깔끔하게 꺼짐
 		setBounds(100, 100, 1280, 720); //x, y, width, height
 		setLocationRelativeTo(null); //스크린 중간에 배치
@@ -143,6 +142,11 @@ public class client extends JFrame implements ActionListener{
 		panel_main.add(panel_option);
 		panel_option.setLayout(null);
 		
+		JLabel labell_Canvas_Top = new JLabel(new ImageIcon("image\\canvas.png"));
+		labell_Canvas_Top.setBounds(176, 105, 802, 34);
+		labell_Canvas_Top.setOpaque(true);
+		panel_main.add(labell_Canvas_Top);
+		
 		panel_canvas = new JPanel();
 		panel_canvas.setOpaque(false);
 		panel_canvas.setBounds(177, 105, 800, 560);
@@ -225,7 +229,6 @@ public class client extends JFrame implements ActionListener{
 		panel_timer.setBorder(new LineBorder(new Color(247,200,200),3,true));
 		panel_main.add(panel_timer);
 		panel_timer.setBounds(10, 10,156, 80);
-		
 		panel_timer.setLayout(null);
 		
 		JLabel stopwatch = new JLabel(new ImageIcon("image\\stopwatch.png"));
@@ -249,7 +252,7 @@ public class client extends JFrame implements ActionListener{
 		panel_main.add(panel_readyexit);
 		panel_readyexit.setLayout(null);
 		
-		if(game_number != 0) {btn_ready.setEnabled(false);}
+		
 		btn_ready = new JButton(new ImageIcon("image\\ready.png"));
 		btn_ready.setPressedIcon(new ImageIcon());
 		btn_ready.setFocusPainted(false);
@@ -267,13 +270,11 @@ public class client extends JFrame implements ActionListener{
 		panel_readyexit.add(btn_exit);
 		btn_exit.addActionListener(this);
 		
-		JLabel labell_Canvas_Top = new JLabel(new ImageIcon("image\\canvas.png"));
-		labell_Canvas_Top.setBounds(176, 105, 802, 34);
-		labell_Canvas_Top.setOpaque(true);
-		panel_main.add(labell_Canvas_Top);
+		
 		
 		panel_chat = new JPanel();
 		panel_chat.setBounds(992, 105, 263, 567);
+		panel_chat.setBackground(new Color(247,243,222));
 		panel_main.add(panel_chat);
 		panel_chat.setLayout(null);
 		
@@ -295,11 +296,21 @@ public class client extends JFrame implements ActionListener{
 		txt_field = new JTextField();
 		txt_field.setBorder(new LineBorder(new Color(120,120,160), 1, true));
 		txt_field.setBackground(new Color(255,255,255));
-		txt_field.setBounds(0, 537, 263, 30);
-		
+		txt_field.setBounds(0, 537, 225, 30);
 		panel_chat.add(txt_field);
 		//panel_chat.setBorder(new LineBorder(Color.BLACK,6,true));
 		txt_field.setColumns(10);
+		
+		btn_enter = new JButton(new ImageIcon("image\\enter.png"));
+		btn_enter.setPressedIcon(new ImageIcon());
+		btn_enter.setFocusPainted(false);
+		btn_enter.setBorderPainted(false);
+		btn_enter.setContentAreaFilled(false);
+		panel_chat.add(btn_enter);
+		btn_enter.setBounds(228, 535, 32,32);
+		btn_enter.addActionListener(this);
+		
+		
 		
 		chatting();
 		
@@ -324,8 +335,8 @@ public class client extends JFrame implements ActionListener{
 			btn_c5.addActionListener(new Sender(s, nickname));
 			btn_ready.addActionListener(new Sender(s, nickname));
 			btn_erase.addActionListener(new Sender(s, nickname));
-			btn_exit.addActionListener(new exit());
 			btn_eraseAll.addActionListener(new Sender(s, nickname));
+			btn_enter.addActionListener(new Sender(s,nickname));
 			canvas.addMouseMotionListener(new Sender(s, nickname));
 			
 		}catch(UnknownHostException uh){
@@ -335,7 +346,7 @@ public class client extends JFrame implements ActionListener{
 			System.exit(0);
 		}
 	}
-	class exit extends Thread implements ActionListener {
+	
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource() == btn_exit){
 				int set;
@@ -346,7 +357,6 @@ public class client extends JFrame implements ActionListener{
 				else {}
 			}
 		}
-	}
 	
 	class Sender extends Thread implements KeyListener, ActionListener, MouseMotionListener {
 		DataOutputStream dos;
@@ -356,7 +366,7 @@ public class client extends JFrame implements ActionListener{
 		Sender(Socket s, String nickname){
 			this.s = s;
 			try{
-				dos = new DataOutputStream(s.getOutputStream());
+				dos = new DataOutputStream(this.s.getOutputStream());
 				this.nickname = nickname;
 			}catch(IOException io){}
 		}
@@ -368,6 +378,8 @@ public class client extends JFrame implements ActionListener{
 		}
 		
 		public void actionPerformed(ActionEvent e){
+			if(e.getSource() == btn_erase) {bool = true;}
+			else {bool = false;}
 			if(e.getSource() == btn_ready){ // '준비' 버튼을 누르면 15회 게임이 시작됨
 				try{
 					dos.writeUTF("_Chat " + "[ " + nickname + " 님 준비 완료  ]");
@@ -413,6 +425,16 @@ public class client extends JFrame implements ActionListener{
 						dos.flush();
 					}
 				}catch(IOException io){}
+			}else if(e.getSource() == btn_enter){ // 
+				String chat = txt_field.getText();
+				txt_field.setText("");
+				try{
+					if(chat.equals("")) {}
+					else {
+						dos.writeUTF("_Chat " + nickname + " : " + chat);
+						dos.flush();
+					}
+				}catch(IOException io){}
 			}
 		}
 		
@@ -421,8 +443,11 @@ public class client extends JFrame implements ActionListener{
 				String chat = txt_field.getText();
 				txt_field.setText("");
 				try{
-					dos.writeUTF("_Chat " + nickname + " : " + chat);
-					dos.flush();
+					if(chat.equals("")) {}
+					else {
+						dos.writeUTF("_Chat " + nickname + " : " + chat);
+						dos.flush();
+					}
 				}catch(IOException io){}
 			}
 		}
@@ -434,21 +459,35 @@ public class client extends JFrame implements ActionListener{
 		    	if(auth == true){
 		    		int x = e.getX(); int y = e.getY();
 		    		dos.writeUTF("_Mouse" + x + "." + y);
+		 
 		    		dos.flush();
 		    	}
 		    }catch(IOException io){}
 		}
-		public void mousePressed(MouseEvent e){}
+		public void mousePressed(MouseEvent e){
+			try{
+		    	if(auth == true){
+		    		int x = e.getX(); int y = e.getY();
+		    		dos.writeUTF("_Mouse" + x + "." + y);
+		 
+		    		dos.flush();
+		    	}
+		    }catch(IOException io){}
+	
+		}
 		public void mouseMoved(MouseEvent e){}
 	}
+	
 	class Receiver extends Thread {
 		Socket s;
 		DataInputStream dis;
+		DataOutputStream dos;
 
 		Receiver(Socket s){
 			this.s = s;
 			try{
 				dis = new DataInputStream(this.s.getInputStream());
+				dos = new DataOutputStream(this.s.getOutputStream());
 			}catch(IOException io){}
 		}
 
@@ -456,6 +495,7 @@ public class client extends JFrame implements ActionListener{
 			while(dis != null){
 				try{
 					String msg = dis.readUTF();
+	
 					if(msg.startsWith("_CList")){ // 명령어 : 클라이언트 목록 갱신
 						playerName = msg.substring(6, msg.indexOf(" "));
 						playerScore = msg.substring(msg.indexOf(" ") + 1, msg.indexOf("#"));
@@ -468,41 +508,54 @@ public class client extends JFrame implements ActionListener{
 						pen canvas2 = (pen)canvas;
 						canvas2.color = Color.BLACK;
 						color = Color.BLACK;
-						bgm("//Play"); // BGM 재생
-					}else if(msg.equals("_GmGG ")){ // 명령어 : 게임 포기
-						gameStart = false;
-						auth = false;
-						txt_field.setEnabled(true);
-						btn_ready.setEnabled(true);
-						label_timer.setText("00 : 00");
-						bgm("_Stop"); // BGM 정지
+						//bgm("_Play"); // BGM 재생
+//					}else if(msg.equals("_GmGG ")){ // 명령어 : 게임 포기
+//						gameStart = false;
+//						auth = false;
+//						txt_field.setEnabled(true);
+//						btn_ready.setEnabled(true);
+//						label_timer.setText("00 : 00");
+//						bgm("_Stop"); // BGM 정지
+					}else if(msg.equals("_StEnd")) {
+						//JOptionPane.showMessageDialog()
 					}else if(msg.equals("_GmEnd")){
-						gameStart = false;
-						auth = false;
+						//gameStart = false;
 						txt_field.setEnabled(true);
-						btn_ready.setEnabled(true);
-						label_timer.setText("00 : 00");
-						bgm("_Stop"); // BGM 정지
+						//btn_ready.setEnabled(true);
+						//label_timer.setText("00 : 00");
+						//bgm("_Stop"); // BGM 정지
+						if(auth == true) {
+							dos.writeUTF("regame");
+							dos.flush();
+						}
+						auth = false;
 					}else if(msg.startsWith("_RExam")){ // 명령어 : 문제 랜덤 출제
 						if(auth == true){
-							JOptionPane.showMessageDialog(null,"당신이 출제자입니다", msg.substring(6), JOptionPane.PLAIN_MESSAGE);
+							JOptionPane.showMessageDialog(null,"단어 : " + msg.substring(6), "밑에 적힌 단어를 그려주세요.", JOptionPane.PLAIN_MESSAGE);
+							txt_area.append("단어 : "+msg.substring(6)+"\n");
 						}else{
-							JOptionPane.showMessageDialog(null, playerName + "님이 출제자입니다.", "답을 적어주세요 ㅎㅎ", JOptionPane.PLAIN_MESSAGE);
+							JOptionPane.showMessageDialog(null, "답을 맞혀주세요.", "information", JOptionPane.PLAIN_MESSAGE);
 						}
-					}else if(msg.startsWith("_Auth ")){ // 명령어 : 출제자 권한 부여
+					}else if(msg.startsWith("_Drwer")){ // 명령어 : 출제자 권한 부여
 						if(login.nickname.equals(msg.substring(6))){
 							auth = true;
 							txt_area.append("[ 당신이 문제 출제자입니다 !! ]" + "\n");
+							
 							txt_field.setEnabled(false);
+						}
+						else {
+							txt_area.append("[" + msg.substring(6) + "님이 문제출제자 입니다!!]\n");
 						}
 					}else if(msg.startsWith("_Mouse")){ // 명령어 : 캔버스 공유
 						if(auth == false){
 							int tempX = Integer.parseInt(msg.substring(6, msg.indexOf("."))); 
 							int tempY = Integer.parseInt(msg.substring(msg.indexOf(".") + 1));
+							
 							g = canvas.getGraphics();
 							g2d = (Graphics2D)g;
 							g2d.setColor(color);
-				            g2d.setStroke(new BasicStroke(6));
+							if(bool) {g2d.setStroke(new BasicStroke(30));}
+					        else g2d.setStroke(new BasicStroke(10));
 				            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		                    g.drawLine(tempX, tempY, tempX, tempY);
 						}
@@ -537,22 +590,21 @@ public class client extends JFrame implements ActionListener{
 		}
 		
 		public void updateClientList(){ // 클라이언트 목록 추가
-			ImageIcon ii;
 			if(Integer.parseInt(playerIdx) == 0){
-				label_player1_nickname.setText("[ " + playerName + " 님 ]");
-				label_player1_score.setText("[ 점수 : " + playerScore + " ]");
+				label_player1_nickname.setText("[ " + playerName + " ]");
+				label_player1_score.setText("[ score : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 1){
-				label_player2_nickname.setText("[ " + playerName + " 님 ]");
-				label_player2_score.setText("[ 점수 : " + playerScore + " ]");
+				label_player2_nickname.setText("[ " + playerName + " ]");
+				label_player2_score.setText("[ score : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 2){
-				label_player3_nickname.setText("[ " + playerName + " 님 ]");
-				label_player3_score.setText("[ 점수 : " + playerScore + " ]");
+				label_player3_nickname.setText("[ " + playerName + " ]");
+				label_player3_score.setText("[ score : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 3){
-				label_player4_nickname.setText("[ " + playerName + " 님 ]");
-				label_player4_score.setText("[ 점수 : " + playerScore + " ]");
+				label_player4_nickname.setText("[ " + playerName + " ]");
+				label_player4_score.setText("[ score : " + playerScore + " ]");
 				deleteClientList();
 			}
 		}
@@ -576,35 +628,38 @@ public class client extends JFrame implements ActionListener{
 			}
 		}
 		
-		public void bgm(String play){ // BGM 재생 & 정지
-			new Thread(){ 
-				public void run(){	
-					try{
-						AudioInputStream ais = AudioSystem.getAudioInputStream(new File("bgm\\bgm.wav"));
-						Clip clip = AudioSystem.getClip();
-						if(play.equals("//Play")){
-							clip.stop();
-							clip.open(ais);
-				            clip.start();
-				            clip.loop(Clip.LOOP_CONTINUOUSLY);
-						}else if(play.equals("//Stop")){
-							System.out.println("진입");
-							clip.close();
-						}
-					}catch(Exception e){}
-				}
-			}.start();
-		}
+//		public void bgm(String play){ // BGM 재생 & 정지
+//			new Thread(){ 
+//				public void run(){	
+//					try{
+//						AudioInputStream ais = AudioSystem.getAudioInputStream(new File("bgm\\bgm.wav"));
+//						Clip clip = AudioSystem.getClip();
+//						if(play.equals("//Play")){
+//							clip.stop();
+//							clip.open(ais);
+//				            clip.start();
+//				            clip.loop(Clip.LOOP_CONTINUOUSLY);
+//						}else if(play.equals("//Stop")){
+//							System.out.println("진입");
+//							clip.close();
+//						}
+//					}catch(Exception e){}
+//				}
+//			}.start();
+//		}
 	}
 	class penController extends JFrame implements ActionListener, MouseMotionListener
 	{	
-		int x1, y1;
+		int x1, x2, y1, y2;
 		public void mouseDragged(MouseEvent e){
-		    x1 = e.getX(); y1 = e.getY();
-		    ((pen)canvas).x = x1; ((pen)canvas).y = y1;
+		    x2 = e.getX(); y2 = e.getY();
+		    ((pen)canvas).x = x2; ((pen)canvas).y = y2;
 		    canvas.repaint();
+			
 		}
-		public void mousePressed(MouseEvent e){}
+		public void mousePressed(MouseEvent e){
+			
+		}
 		public void mouseMoved(MouseEvent e){}
 		
 		public void actionPerformed(ActionEvent e){
@@ -641,9 +696,10 @@ public class client extends JFrame implements ActionListener{
 			if(gameStart == true && auth == true){// 바꾸기
 				Graphics2D g2d = (Graphics2D)g;
 	            g2d.setColor(color);
-	            g2d.setStroke(new BasicStroke(3));
-	            //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	            g2d.drawLine(x, y, x, y);
+	            if(bool) {g2d.setStroke(new BasicStroke(30));}
+	            else g2d.setStroke(new BasicStroke(10));
+	            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	            g2d.drawLine(x, y, x,y);
 			}
 		}
 		
@@ -651,4 +707,5 @@ public class client extends JFrame implements ActionListener{
 			paintOption(g);
 		}
 	}
+	
 }
