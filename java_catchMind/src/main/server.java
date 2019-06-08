@@ -28,7 +28,6 @@ public class server extends JFrame implements ActionListener {
 	public static int drawer = 0;
 	public static final int MAX_CLIENT = 4;
 	public static int gameNum = 0;
-	//public boolean once = true;
 	String sentence;
 
 	public void init() {
