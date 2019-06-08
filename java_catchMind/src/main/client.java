@@ -22,25 +22,26 @@ public class client extends JFrame implements ActionListener{
 	Color color;
 	Graphics g;
 	Graphics2D g2d;
-	public static boolean bool = false;
 	
 	int port = 8888;
 	String playerName, playerScore, playerIdx;
 	boolean gameStart, auth;
 	
+	public static boolean bool = false;
+	
 	public client(){
-		setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
-		setTitle("JAVA Catchmind project - 민수, 나연 , 정재 -"); 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		setBounds(100, 100, 1280, 720);
-		setLocationRelativeTo(null);
-		setVisible(true);
-		setResizable(false);
+		setFont(new Font("나눔바른고딕", Font.PLAIN, 13)); //글꼴 : 나눔바른고딕, 폰트 : 평평하게, 크기 : 13
+		setTitle("JAVA Catchmind project - 민수, 나연 , 정재 -"); //제목
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //끌때 깔끔하게 꺼짐
+		setBounds(100, 100, 1280, 720); //x, y, width, height
+		setLocationRelativeTo(null); //스크린 중간에 배치
+		setVisible(true); //화면을 볼 수 있게
+		setResizable(false); //화면을 확대, 축소 불가능
 		
-		contentPane = new JPanel();
-		contentPane.setBorder(null);
-		setContentPane(contentPane);
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
+		contentPane = new JPanel(); //contentpanel을 만든다.
+		contentPane.setBorder(null); //
+		setContentPane(contentPane); //contentpanel을 contentPane으로 해준다
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS)); //box 레이아웃
 		
 		panel_main = new JPanel();
 		panel_main.setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
@@ -327,15 +328,16 @@ public class client extends JFrame implements ActionListener{
 			new Thread(sender).start();
 			new Thread(receiver).start();
 			
-			txt_field.addKeyListener(new Sender(s, nickname));
+			
 			btn_c1.addActionListener(new Sender(s, nickname));
 			btn_c2.addActionListener(new Sender(s, nickname));
 			btn_c3.addActionListener(new Sender(s, nickname));
 			btn_c4.addActionListener(new Sender(s, nickname));
 			btn_c5.addActionListener(new Sender(s, nickname));
-			btn_ready.addActionListener(new Sender(s, nickname));
 			btn_erase.addActionListener(new Sender(s, nickname));
 			btn_eraseAll.addActionListener(new Sender(s, nickname));
+			txt_field.addKeyListener(new Sender(s, nickname));	
+			btn_ready.addActionListener(new Sender(s, nickname));
 			btn_enter.addActionListener(new Sender(s,nickname));
 			canvas.addMouseMotionListener(new Sender(s, nickname));
 			
@@ -378,8 +380,6 @@ public class client extends JFrame implements ActionListener{
 		}
 		
 		public void actionPerformed(ActionEvent e){
-			if(e.getSource() == btn_erase) {bool = true;}
-			else {bool = false;}
 			if(e.getSource() == btn_ready){ // '준비' 버튼을 누르면 15회 게임이 시작됨
 				try{
 					dos.writeUTF("_Chat " + "[ " + nickname + " 님 준비 완료  ]");
@@ -388,42 +388,52 @@ public class client extends JFrame implements ActionListener{
 					dos.flush();
 					btn_ready.setEnabled(false);
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c1){ // 색상 설정 버튼
+			}else if(e.getSource() == btn_c1 && auth){ // 색상 설정 버튼
 				try{
 					dos.writeUTF("_Color" + "Red");
 					dos.flush();
+					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c2){
+			}else if(e.getSource() == btn_c2 && auth){
 				try{
 					dos.writeUTF("_Color" + "Green");
 					dos.flush();
+					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c3){
+			}else if(e.getSource() == btn_c3 && auth){
 				try{
 					dos.writeUTF("_Color" + "Blue");
 					dos.flush();
+					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c4){
+			}else if(e.getSource() == btn_c4 && auth){
 				try{
 					dos.writeUTF("_Color" + "Yellow");
 					dos.flush();
+					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c5){
+			}else if(e.getSource() == btn_c5 && auth){
 				try{
 					dos.writeUTF("_Color" + "Black");
 					dos.flush();
+					bool = false;
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_erase){ // '지우기' 버튼
 				try{
-					dos.writeUTF("_Erase");
-					dos.flush();
+					if(auth) {
+						dos.writeUTF("_Erase" );
+						dos.flush();
+						bool = true;
+					}
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_eraseAll){ // '모두 지우기' 버튼
 				try{
 					if(auth == true){
 						dos.writeUTF("_ErAll");
+						bool = false;
 						dos.flush();
 					}
+					
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_enter){ // 
 				String chat = txt_field.getText();
@@ -496,19 +506,22 @@ public class client extends JFrame implements ActionListener{
 				try{
 					String msg = dis.readUTF();
 	
-					if(msg.startsWith("_CList")){
+					if(msg.startsWith("_CList")){ // 명령어 : 클라이언트 목록 갱신
 						playerName = msg.substring(6, msg.indexOf(" "));
 						playerScore = msg.substring(msg.indexOf(" ") + 1, msg.indexOf("#"));
 						playerIdx = msg.substring(msg.indexOf("#") + 1);
 						updateClientList();
-					}else if(msg.startsWith("_Start")){
+					}else if(msg.startsWith("_Start")){ // 명령어 : 게임 시작 (+타이머)
 						gameStart = true;
 						g = canvas.getGraphics(); // 캔버스 설정 초기화
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 						pen canvas2 = (pen)canvas;
 						canvas2.color = Color.BLACK;
 						color = Color.BLACK;
-					}else if(msg.equals("_StEnd")) {
+					}else if(msg.startsWith("_StEnd")) {
+						btn_ready.setEnabled(true);
+						JOptionPane.showMessageDialog(null, msg.substring(6), "                [Score Board]", JOptionPane.INFORMATION_MESSAGE);
+						auth = false;
 					}else if(msg.equals("_GmEnd")){
 						//gameStart = false;
 						txt_field.setEnabled(true);
@@ -545,14 +558,15 @@ public class client extends JFrame implements ActionListener{
 							g = canvas.getGraphics();
 							g2d = (Graphics2D)g;
 							g2d.setColor(color);
-							if(bool) {g2d.setStroke(new BasicStroke(30));}
-					        else g2d.setStroke(new BasicStroke(10));
+							if(bool) g2d.setStroke(new BasicStroke(30));
+							else g2d.setStroke(new BasicStroke(10));
 				            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		                    g.drawLine(tempX, tempY, tempX, tempY);
 						}
 					}else if(msg.startsWith("_Timer")){
 						label_timer.setText(msg.substring(6));
 					}else if(msg.startsWith("_Color")){ // 명령어 : 컬러 설정
+						bool = false;
 						String temp = msg.substring(6);
 						switch(temp){
 							case "Red": color = Color.RED; break;
@@ -563,7 +577,10 @@ public class client extends JFrame implements ActionListener{
 						}
 					}else if(msg.equals("_Erase")){ // 클라이언트측 명령어 : 지우기
 						color = Color.WHITE;
+						g2d.setStroke(new BasicStroke(30));
+						bool = true;
 					}else if(msg.equals("_ErAll")){ // 클라이언트측 명령어 : 모두 지우기
+						bool = false;
 						g = canvas.getGraphics();
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 					}else{ // 채팅 출력
