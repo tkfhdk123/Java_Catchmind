@@ -496,28 +496,19 @@ public class client extends JFrame implements ActionListener{
 				try{
 					String msg = dis.readUTF();
 	
-					if(msg.startsWith("_CList")){ // 명령어 : 클라이언트 목록 갱신
+					if(msg.startsWith("_CList")){
 						playerName = msg.substring(6, msg.indexOf(" "));
 						playerScore = msg.substring(msg.indexOf(" ") + 1, msg.indexOf("#"));
 						playerIdx = msg.substring(msg.indexOf("#") + 1);
 						updateClientList();
-					}else if(msg.startsWith("_Start")){ // 명령어 : 게임 시작 (+타이머)
+					}else if(msg.startsWith("_Start")){
 						gameStart = true;
 						g = canvas.getGraphics(); // 캔버스 설정 초기화
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 						pen canvas2 = (pen)canvas;
 						canvas2.color = Color.BLACK;
 						color = Color.BLACK;
-						//bgm("_Play"); // BGM 재생
-//					}else if(msg.equals("_GmGG ")){ // 명령어 : 게임 포기
-//						gameStart = false;
-//						auth = false;
-//						txt_field.setEnabled(true);
-//						btn_ready.setEnabled(true);
-//						label_timer.setText("00 : 00");
-//						bgm("_Stop"); // BGM 정지
 					}else if(msg.equals("_StEnd")) {
-						//JOptionPane.showMessageDialog()
 					}else if(msg.equals("_GmEnd")){
 						//gameStart = false;
 						txt_field.setEnabled(true);
