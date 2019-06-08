@@ -29,18 +29,18 @@ public class client extends JFrame implements ActionListener{
 	boolean gameStart, auth;
 	
 	public client(){
-		setFont(new Font("나눔바른고딕", Font.PLAIN, 13)); //글꼴 : 나눔바른고딕, 폰트 : 평평하게, 크기 : 13
-		setTitle("JAVA Catchmind project - 민수, 나연 , ㅈㅈ -"); //제목
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //끌때 깔끔하게 꺼짐
-		setBounds(100, 100, 1280, 720); //x, y, width, height
-		setLocationRelativeTo(null); //스크린 중간에 배치
-		setVisible(true); //화면을 볼 수 있게
-		setResizable(false); //화면을 확대, 축소 불가능
+		setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
+		setTitle("JAVA Catchmind project - 민수, 나연 , 정재 -"); 
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		setBounds(100, 100, 1280, 720);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		setResizable(false);
 		
-		contentPane = new JPanel(); //contentpanel을 만든다.
-		contentPane.setBorder(null); //
-		setContentPane(contentPane); //contentpanel을 contentPane으로 해준다
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS)); //box 레이아웃
+		contentPane = new JPanel();
+		contentPane.setBorder(null);
+		setContentPane(contentPane);
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		
 		panel_main = new JPanel();
 		panel_main.setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
