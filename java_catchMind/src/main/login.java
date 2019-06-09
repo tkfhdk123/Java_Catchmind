@@ -113,8 +113,8 @@ public class login extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(null, "닉네임을 입력해 주세요", "ERROR!", JOptionPane.WARNING_MESSAGE);
 			}else if(txt_ip.getText().equals("")){
 				JOptionPane.showMessageDialog(null, "IP 주소를 입력해 주세요", "ERROR!", JOptionPane.WARNING_MESSAGE);
-			}else if(txt_nickname.getText().trim().length() >=5){
-				JOptionPane.showMessageDialog(null, "닉네임은 4글자까지만 입력할수 있습니다", "ERROR!", JOptionPane.WARNING_MESSAGE);
+			}else if(txt_nickname.getText().trim().length() >=8){
+				JOptionPane.showMessageDialog(null, "닉네임은 7글자까지만 입력할수 있습니다", "ERROR!", JOptionPane.WARNING_MESSAGE);
 				txt_nickname.setText("");
 			}else{
 				nickname = txt_nickname.getText().trim(); //trim으로 공백빼고 저장 - isempty를 이용해서도 만들 수 있음
