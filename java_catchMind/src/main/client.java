@@ -8,11 +8,13 @@ import javax.swing.border.*;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class client extends JFrame implements ActionListener{
 	JPanel contentPane, panel_main, panel_chat, panel_exam, panel_canvas, panel_option, panel_timer, panel_readyexit;
 	JButton btn_ready, btn_exit, btn_c1, btn_c2, btn_c3, btn_c4, btn_c5, btn_erase, btn_eraseAll, btn_enter;
-	JLabel label_canvas, label_exam, label_exam_nickname, label_timer, label_player1, label_player2, label_player3, label_player4;
+	JLabel label_canvas, label_exam, label_exam_nickname, label_timer, label_player1, label_player2, label_player3, label_player4, label_round;
 	Label label_player1_nickname, label_player2_nickname, label_player3_nickname, label_player4_nickname;
 	Label label_player1_score, label_player2_score, label_player3_score, label_player4_score;
 	JTextField txt_field;
@@ -22,26 +24,26 @@ public class client extends JFrame implements ActionListener{
 	Color color;
 	Graphics g;
 	Graphics2D g2d;
-	
-	int port = 8888;
-	String playerName, playerScore, playerIdx;
-	boolean gameStart, auth;
-	
 	public static boolean bool = false;
+	Vector<Point> vec = new Vector<Point>();
+	
+	int port = 8800;
+	String playerName, playerScore, playerIdx;
+	boolean gameStart, drawer;
 	
 	public client(){
-		setFont(new Font("나눔바른고딕", Font.PLAIN, 13)); //글꼴 : 나눔바른고딕, 폰트 : 평평하게, 크기 : 13
-		setTitle("JAVA Catchmind project - 민수, 나연 , 정재 -"); //제목
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //끌때 깔끔하게 꺼짐
-		setBounds(100, 100, 1280, 720); //x, y, width, height
-		setLocationRelativeTo(null); //스크린 중간에 배치
-		setVisible(true); //화면을 볼 수 있게
-		setResizable(false); //화면을 확대, 축소 불가능
+		setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
+		setTitle("JAVA Catchmind project - 민수, 나연 , 정재 -"); 
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+		setBounds(100, 100, 1280, 720);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		setResizable(false);
 		
-		contentPane = new JPanel(); //contentpanel을 만든다.
-		contentPane.setBorder(null); //
-		setContentPane(contentPane); //contentpanel을 contentPane으로 해준다
-		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS)); //box 레이아웃
+		contentPane = new JPanel();
+		contentPane.setBorder(null);
+		setContentPane(contentPane);
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		
 		panel_main = new JPanel();
 		panel_main.setFont(new Font("나눔바른고딕", Font.PLAIN, 13));
@@ -148,17 +150,32 @@ public class client extends JFrame implements ActionListener{
 		labell_Canvas_Top.setOpaque(true);
 		panel_main.add(labell_Canvas_Top);
 		
+		
+		
 		panel_canvas = new JPanel();
 		panel_canvas.setOpaque(false);
 		panel_canvas.setBounds(177, 105, 800, 560);
 		panel_main.add(panel_canvas);
 		panel_canvas.setLayout(new BorderLayout(0, 0));
 		
+		label_round = new JLabel("Round 0");
+	      label_round.setHorizontalTextPosition(SwingConstants.CENTER);
+	      label_round.setHorizontalAlignment(SwingConstants.CENTER);
+	      label_round.setFont(new Font("나눔바른고딕", Font.PLAIN, 17));
+	      label_round.setForeground(Color.BLACK);
+	      label_round.setBounds(30, 50, 100, 30);
+	      label_round.setBorder(new LineBorder(new Color(247,243,222)));
+	      label_round.setBackground(Color.WHITE);
+	      panel_canvas.add(label_round);
+		
 		canvas = new pen();
 		canvas.setBackground(Color.WHITE);
 		panel_canvas.add(canvas, BorderLayout.CENTER);
 		penController p = new penController(); // 캔버스 핸들러
 		canvas.addMouseMotionListener(p);
+		canvas.addMouseListener(p);
+		
+		
 		
 		
 		btn_c1 = new JButton(new ImageIcon("image\\red.png"));
@@ -262,7 +279,7 @@ public class client extends JFrame implements ActionListener{
 		btn_ready.setBounds(40, 10, 64, 64);
 		panel_readyexit.add(btn_ready);
 		
-		btn_exit = new JButton(new ImageIcon("image\\exit.png"));
+		btn_exit = new JButton(new ImageIcon("image\\close.png"));
 		btn_exit.setPressedIcon(new ImageIcon());
 		btn_exit.setFocusPainted(false);
 		btn_exit.setBorderPainted(false);
@@ -328,18 +345,21 @@ public class client extends JFrame implements ActionListener{
 			new Thread(sender).start();
 			new Thread(receiver).start();
 			
+			txt_field.addKeyListener(new Sender(s, nickname));
 			
-			btn_c1.addActionListener(new Sender(s, nickname));
-			btn_c2.addActionListener(new Sender(s, nickname));
-			btn_c3.addActionListener(new Sender(s, nickname));
-			btn_c4.addActionListener(new Sender(s, nickname));
-			btn_c5.addActionListener(new Sender(s, nickname));
-			btn_erase.addActionListener(new Sender(s, nickname));
+				btn_c1.addActionListener(new Sender(s, nickname));
+				btn_c2.addActionListener(new Sender(s, nickname));
+				btn_c3.addActionListener(new Sender(s, nickname));
+				btn_c4.addActionListener(new Sender(s, nickname));
+				btn_c5.addActionListener(new Sender(s, nickname));
+				btn_erase.addActionListener(new Sender(s, nickname));
+				
+			
 			btn_eraseAll.addActionListener(new Sender(s, nickname));
-			txt_field.addKeyListener(new Sender(s, nickname));	
 			btn_ready.addActionListener(new Sender(s, nickname));
 			btn_enter.addActionListener(new Sender(s,nickname));
 			canvas.addMouseMotionListener(new Sender(s, nickname));
+			canvas.addMouseListener(new Sender(s, nickname));
 			
 		}catch(UnknownHostException uh){
 			JOptionPane.showMessageDialog(null, "호스트를 찾지 못했습니다.", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -360,7 +380,7 @@ public class client extends JFrame implements ActionListener{
 			}
 		}
 	
-	class Sender extends Thread implements KeyListener, ActionListener, MouseMotionListener {
+	class Sender extends Thread implements KeyListener, ActionListener, MouseMotionListener, MouseListener {
 		DataOutputStream dos;
 		Socket s;
 		String nickname;
@@ -388,31 +408,31 @@ public class client extends JFrame implements ActionListener{
 					dos.flush();
 					btn_ready.setEnabled(false);
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c1 && auth){ // 색상 설정 버튼
+			}else if(e.getSource() == btn_c1&&drawer){ // 색상 설정 버튼
 				try{
 					dos.writeUTF("_Color" + "Red");
 					dos.flush();
 					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c2 && auth){
+			}else if(e.getSource() == btn_c2&&drawer){
 				try{
 					dos.writeUTF("_Color" + "Green");
 					dos.flush();
 					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c3 && auth){
+			}else if(e.getSource() == btn_c3&&drawer){
 				try{
 					dos.writeUTF("_Color" + "Blue");
 					dos.flush();
 					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c4 && auth){
+			}else if(e.getSource() == btn_c4&&drawer){
 				try{
 					dos.writeUTF("_Color" + "Yellow");
 					dos.flush();
 					bool = false;
 				}catch(IOException io){}
-			}else if(e.getSource() == btn_c5 && auth){
+			}else if(e.getSource() == btn_c5&&drawer){
 				try{
 					dos.writeUTF("_Color" + "Black");
 					dos.flush();
@@ -420,20 +440,24 @@ public class client extends JFrame implements ActionListener{
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_erase){ // '지우기' 버튼
 				try{
-					if(auth) {
-						dos.writeUTF("_Erase" );
+					if(drawer) {
+						
+						dos.writeUTF("_Erase");
+						
 						dos.flush();
 						bool = true;
 					}
+					
+					
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_eraseAll){ // '모두 지우기' 버튼
 				try{
-					if(auth == true){
+					if(drawer){
 						dos.writeUTF("_ErAll");
-						bool = false;
+						
 						dos.flush();
+						bool = false;
 					}
-					
 				}catch(IOException io){}
 			}else if(e.getSource() == btn_enter){ // 
 				String chat = txt_field.getText();
@@ -463,10 +487,9 @@ public class client extends JFrame implements ActionListener{
 		}
 		public void keyTyped(KeyEvent e){}
 		public void keyPressed(KeyEvent e){}
-		
 		public void mouseDragged(MouseEvent e){ // 마우스 좌표 전송
 		    try{
-		    	if(auth == true){
+		    	if(drawer){
 		    		int x = e.getX(); int y = e.getY();
 		    		dos.writeUTF("_Mouse" + x + "." + y);
 		 
@@ -476,16 +499,31 @@ public class client extends JFrame implements ActionListener{
 		}
 		public void mousePressed(MouseEvent e){
 			try{
-		    	if(auth == true){
+		    	if(drawer){
 		    		int x = e.getX(); int y = e.getY();
 		    		dos.writeUTF("_Mouse" + x + "." + y);
 		 
 		    		dos.flush();
 		    	}
 		    }catch(IOException io){}
-	
+		}
+		
+		public void mouseReleased(MouseEvent e) {
+			try {
+				if(drawer) {
+					dos.writeUTF("_Mousereleased");
+					dos.flush();
+				}
+			}catch(IOException io) {}
+			
 		}
 		public void mouseMoved(MouseEvent e){}
+		public void mouseClicked(MouseEvent arg0) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+
+		
+		
 	}
 	
 	class Receiver extends Thread {
@@ -506,12 +544,12 @@ public class client extends JFrame implements ActionListener{
 				try{
 					String msg = dis.readUTF();
 	
-					if(msg.startsWith("_CList")){ // 명령어 : 클라이언트 목록 갱신
+					if(msg.startsWith("_CList")){
 						playerName = msg.substring(6, msg.indexOf(" "));
 						playerScore = msg.substring(msg.indexOf(" ") + 1, msg.indexOf("#"));
 						playerIdx = msg.substring(msg.indexOf("#") + 1);
 						updateClientList();
-					}else if(msg.startsWith("_Start")){ // 명령어 : 게임 시작 (+타이머)
+					}else if(msg.startsWith("_Start")){
 						gameStart = true;
 						g = canvas.getGraphics(); // 캔버스 설정 초기화
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -521,20 +559,23 @@ public class client extends JFrame implements ActionListener{
 					}else if(msg.startsWith("_StEnd")) {
 						btn_ready.setEnabled(true);
 						JOptionPane.showMessageDialog(null, msg.substring(6), "                [Score Board]", JOptionPane.INFORMATION_MESSAGE);
-						auth = false;
+						drawer = false;
 					}else if(msg.equals("_GmEnd")){
+						bool = false;
 						//gameStart = false;
 						txt_field.setEnabled(true);
 						//btn_ready.setEnabled(true);
 						//label_timer.setText("00 : 00");
 						//bgm("_Stop"); // BGM 정지
-						if(auth == true) {
+					if(drawer) {
+							
 							dos.writeUTF("regame");
 							dos.flush();
+							
 						}
-						auth = false;
+						drawer = false;
 					}else if(msg.startsWith("_RExam")){ // 명령어 : 문제 랜덤 출제
-						if(auth == true){
+						if(drawer){
 							JOptionPane.showMessageDialog(null,"단어 : " + msg.substring(6), "밑에 적힌 단어를 그려주세요.", JOptionPane.PLAIN_MESSAGE);
 							txt_area.append("단어 : "+msg.substring(6)+"\n");
 						}else{
@@ -542,7 +583,7 @@ public class client extends JFrame implements ActionListener{
 						}
 					}else if(msg.startsWith("_Drwer")){ // 명령어 : 출제자 권한 부여
 						if(login.nickname.equals(msg.substring(6))){
-							auth = true;
+							drawer = true;
 							txt_area.append("[ 당신이 문제 출제자입니다 !! ]" + "\n");
 							
 							txt_field.setEnabled(false);
@@ -551,17 +592,29 @@ public class client extends JFrame implements ActionListener{
 							txt_area.append("[" + msg.substring(6) + "님이 문제출제자 입니다!!]\n");
 						}
 					}else if(msg.startsWith("_Mouse")){ // 명령어 : 캔버스 공유
-						if(auth == false){
-							int tempX = Integer.parseInt(msg.substring(6, msg.indexOf("."))); 
-							int tempY = Integer.parseInt(msg.substring(msg.indexOf(".") + 1));
+						if(!drawer){
+							if(msg.substring(6).equals("released")) vec.clear();
+							else {
+								int x = Integer.parseInt(msg.substring(6, msg.indexOf("."))); 
+								int y = Integer.parseInt(msg.substring(msg.indexOf(".") + 1));
+								Point point =  new Point();
+								point.x =x; point.y = y;
+								vec.add(point);
+								
+								g = canvas.getGraphics();
+								g2d = (Graphics2D)g;
+								g2d.setColor(color);
+								if(bool) g2d.setStroke(new BasicStroke(30)); 
+								else g2d.setStroke(new BasicStroke(10));
+					            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+					            for(int i = 1;i<vec.size(); i++) {
+					            	if(vec.get(i-1)==null) continue;
+					            	else if(vec.get(i)==null) continue;
+					            	else g.drawLine((int)vec.get(i-1).getX(), (int)vec.get(i-1).getY(),
+					            			(int)vec.get(i).getX(), (int)vec.get(i).getY());
+					            }	
+							}
 							
-							g = canvas.getGraphics();
-							g2d = (Graphics2D)g;
-							g2d.setColor(color);
-							if(bool) g2d.setStroke(new BasicStroke(30));
-							else g2d.setStroke(new BasicStroke(10));
-				            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		                    g.drawLine(tempX, tempY, tempX, tempY);
 						}
 					}else if(msg.startsWith("_Timer")){
 						label_timer.setText(msg.substring(6));
@@ -576,14 +629,20 @@ public class client extends JFrame implements ActionListener{
 							case "Black": color = Color.BLACK; break;
 						}
 					}else if(msg.equals("_Erase")){ // 클라이언트측 명령어 : 지우기
+						
 						color = Color.WHITE;
-						g2d.setStroke(new BasicStroke(30));
+						vec.clear();
+						
 						bool = true;
 					}else if(msg.equals("_ErAll")){ // 클라이언트측 명령어 : 모두 지우기
 						bool = false;
+						vec.clear();
 						g = canvas.getGraphics();
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-					}else{ // 채팅 출력
+					}else if(msg.startsWith("_Round")) {
+		                  String num = msg.substring(6);
+		                  label_round.setText("Round " +num);
+		            }else{ // 채팅 출력
 						txt_area.append(msg + "\n");
 						scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 					}
@@ -600,19 +659,19 @@ public class client extends JFrame implements ActionListener{
 		public void updateClientList(){ // 클라이언트 목록 추가
 			if(Integer.parseInt(playerIdx) == 0){
 				label_player1_nickname.setText("[ " + playerName + " ]");
-				label_player1_score.setText("[ score : " + playerScore + " ]");
+				label_player1_score.setText("[ 점수 : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 1){
 				label_player2_nickname.setText("[ " + playerName + " ]");
-				label_player2_score.setText("[ score : " + playerScore + " ]");
+				label_player2_score.setText("[ 점수 : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 2){
 				label_player3_nickname.setText("[ " + playerName + " ]");
-				label_player3_score.setText("[ score : " + playerScore + " ]");
+				label_player3_score.setText("[ 점수 : " + playerScore + " ]");
 				deleteClientList();
 			}else if(Integer.parseInt(playerIdx) == 3){
 				label_player4_nickname.setText("[ " + playerName + " ]");
-				label_player4_score.setText("[ score : " + playerScore + " ]");
+				label_player4_score.setText("[ 점수 : " + playerScore + " ]");
 				deleteClientList();
 			}
 		}
@@ -656,17 +715,27 @@ public class client extends JFrame implements ActionListener{
 //			}.start();
 //		}
 	}
-	class penController extends JFrame implements ActionListener, MouseMotionListener
+	
+	
+
+	
+	class penController extends JFrame implements ActionListener, MouseMotionListener, MouseListener
 	{	
 		int x1, x2, y1, y2;
+		public void mouseReleased(MouseEvent e) {
+			vec.clear();
+			repaint();
+		}
+		
 		public void mouseDragged(MouseEvent e){
-		    x2 = e.getX(); y2 = e.getY();
-		    ((pen)canvas).x = x2; ((pen)canvas).y = y2;
+			vec.add(new Point(e.getX(),e.getY()));
 		    canvas.repaint();
-			
 		}
 		public void mousePressed(MouseEvent e){
 			
+			
+			vec.add(new Point(e.getX(),e.getY()));
+		    canvas.repaint();
 		}
 		public void mouseMoved(MouseEvent e){}
 		
@@ -674,7 +743,7 @@ public class client extends JFrame implements ActionListener{
 			Object obj = e.getSource();
 			pen canvas2 = (pen)canvas;
 		   
-			if(auth == true){
+			if(drawer){
 			    if(obj == btn_c1){
 				    canvas2.color = Color.RED;
 			    }else if(obj == btn_c2){
@@ -686,6 +755,8 @@ public class client extends JFrame implements ActionListener{
 			    }else if(obj == btn_c5){
 			    	canvas2.color = Color.BLACK;
 			    }else if(obj == btn_erase){
+			    	vec.clear();
+			    	repaint();
 			    	canvas2.color = canvas.getBackground();
 			    }else if(obj == btn_eraseAll){
 			    	Graphics g = canvas2.getGraphics();
@@ -693,22 +764,32 @@ public class client extends JFrame implements ActionListener{
 			    }
 			}
 		}
+	
+		public void mouseClicked(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+		
 	}
 	class pen extends Canvas
 	{
-		int x;
-		int y;
+		Point p;
 		Color color = Color.BLACK;
 
 		public void paintOption(Graphics g){
-			if(gameStart == true && auth == true){// 바꾸기
+			if(gameStart == true && drawer){
 				Graphics2D g2d = (Graphics2D)g;
 	            g2d.setColor(color);
-	            if(bool) {g2d.setStroke(new BasicStroke(30));}
+	            if(bool) g2d.setStroke(new BasicStroke(30));
 	            else g2d.setStroke(new BasicStroke(10));
 	            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	            g2d.drawLine(x, y, x,y);
-			}
+	        
+	            for(int i = 1;i<vec.size(); i++) {
+	            	if(vec.get(i-1)==null) continue;
+	            	else if(vec.get(i)==null) continue;
+	            	else g.drawLine((int)vec.get(i-1).getX(), (int)vec.get(i-1).getY(),
+	            			(int)vec.get(i).getX(), (int)vec.get(i).getY());
+	            }
+	       }
 		}
 		
 		public void update(Graphics g){
