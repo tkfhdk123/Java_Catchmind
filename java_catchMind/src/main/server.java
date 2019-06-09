@@ -17,6 +17,7 @@ public class server extends JFrame implements ActionListener {
 	JButton serverstart_btn, serverclose_btn;
 
 	boolean gamestart, setEnd = false;
+	public static boolean timebreak = false;
 	LinkedHashMap<String, DataOutputStream> clientOutput = new LinkedHashMap<String, DataOutputStream>();
 	LinkedHashMap<String, Integer> clientScore = new LinkedHashMap<String, Integer>();
 
@@ -24,11 +25,12 @@ public class server extends JFrame implements ActionListener {
 	Socket s;
 	int port = 8800;
 	int readyPlayer;
-	int score;
+	int score, currentTime = 0;
 	public static int drawer = 0;
-	public static boolean once = false;
 	public static final int MAX_CLIENT = 4;
 	public static int gameNum = 0;
+	public static int setNum = 0;
+	//public static boolean set0 = false;
 	String sentence;
 
 	public void init() {
@@ -174,9 +176,11 @@ public class server extends JFrame implements ActionListener {
 		Socket soc;
 		DataInputStream dis;
 		DataOutputStream dos;
-		Timer tm = new Timer();
+		//Timer[] tmArr = new Timer[15];
+	    Timer tm = new Timer();
 
 		public clientManager(Socket soc) {
+			
 			this.soc = soc;
 			try {
 				dis = new DataInputStream(soc.getInputStream());
@@ -250,7 +254,8 @@ public class server extends JFrame implements ActionListener {
 		}
 
 		public void gameStart() {
-
+			// for(int i =0; i<15; i++) tmArr[i] = new Timer();
+			
 			ArrayList<String> drawerList = new ArrayList<String>();
 			Iterator<String> it = clientOutput.keySet().iterator();
 
@@ -260,15 +265,27 @@ public class server extends JFrame implements ActionListener {
 				drawer = 0;
 			}
 			serverMsg("_Drwer" + drawerList.get(drawer++));
-
+			
 			Quiz quiz = new Quiz();
 			quiz.start(); // 문제 출제
-			tm = new Timer();
-			tm.start();
+			if(gameNum==0&&setNum==0) {
+				
+				tm.start();
+			}
+//			if(gameNum>0) {
+//				tm.cancel();
+//			}
+//			tm = new Timer();
+//			tm.run();
+//			if (gameNum != 0)
+//				tmArr[gameNum - 1].cancel();
+//			tmArr[gameNum] = new Timer();
+//			tmArr[gameNum].run();
+
 			gamestart = true;
 			serverMsg("_Round" + (gameNum + 1));
 			serverMsg("_Start"); // 명령어 : 게임 시작
-
+			timebreak = false;
 		}
 
 		public void command(String str) {
@@ -317,16 +334,19 @@ public class server extends JFrame implements ActionListener {
 			}
 
 			else if (cmd.equals("regame")) {
+				currentTime = 0;
+				serverMsg("_Timer03 : 00");
+				timebreak = true;
+				if (gameNum++ < 14) {
 
-				tm.interrupt();
-
-				if (gameNum++ < 2 && !once) {
-					once = true;
 					gameStart();
 					serverMsg("======" + "다음 게임이 곧 시작됩니다." + "======\n");
-
+					
 				} else {
+					
 					setEnd = true;
+					setNum++;
+					
 					serverMsg("======" + "세트가 종료되었습니다 !" + "======\n");
 
 					List<Map.Entry<String, Integer>> list = new LinkedList<>(clientScore.entrySet());
@@ -370,13 +390,15 @@ public class server extends JFrame implements ActionListener {
 			String ans = str.substring(str.lastIndexOf(" ") + 1); // 정답 내용
 
 			if (ans.equals(sentence)) {
-				serverMsg("======" + nickname + " 님이 맞혔습니다!" + "===========\n ===========정답은 [" + sentence
+				serverMsg("======" + nickname + " 님이 맞혔습니다!" + "===========\n =======정답은 [" + sentence
 						+ "]!!!!===========");
 				clientScore.put(nickname, clientScore.get(nickname) + 1); // 정답자 점수 추가
 				clientSet();
-				once = false;
+				currentTime = 0;
+				serverMsg("_Timer03 : 00");
+				timebreak = true;
 				gamestart = false;
-				serverMsg("_GmEnd"+"");
+				serverMsg("_GmEnd" + "0");
 			}
 		}
 	}
@@ -387,7 +409,7 @@ public class server extends JFrame implements ActionListener {
 
 		public void run() {
 			Random r = new Random();
-			int num = r.nextInt(30);
+			int num = r.nextInt(100);
 			try {
 				FileReader fr = new FileReader("wordcollection.txt");
 				br = new BufferedReader(fr);
@@ -400,30 +422,35 @@ public class server extends JFrame implements ActionListener {
 		}
 	}
 
-	class Timer extends Thread {
-		int currentTime = 0;
-
+	class Timer extends Thread{
 		public void run() {
 			try {
-				while (gamestart == true) {
-					sleep(1000);
-					currentTime++;
-					serverMsg("_Timer" + toTime(currentTime));
-					if (currentTime>179) {
-						gamestart = false;
-						serverMsg("=========정답은 [" + sentence+"]!!!!=============\n");
-						serverMsg("_GmEnd"+"1"+sentence);
+				
+				while (true) {
+					
+//					else{
+						sleep(1000);
+						if(!timebreak) currentTime++;
 						
-						break;
-					}
-
+						if(currentTime ==0) serverMsg("_Timer03 : 00");
+						else serverMsg("_Timer" + toTime(currentTime));
+						if (currentTime > 179) {
+							gamestart = false;
+							serverMsg("=========정답은 [" + sentence + "]!!!!=============\n");
+							serverMsg("_GmEnd" + "1" + sentence);
+						}
+//					}
 				}
+					
 			} catch (Exception e) {}
 		}
 
 		String toTime(int time) {
 			int m = time / 60;
 			int s = time - 60 * m;
+			if(s >= 60) {
+				m++; s = 0;
+			}
 			return String.format("%02d : %02d", 2 - m, 60 - s);
 		}
 	}
