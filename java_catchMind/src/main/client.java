@@ -172,8 +172,10 @@ public class client extends JFrame implements ActionListener{
 		canvas.setBackground(Color.WHITE);
 		panel_canvas.add(canvas, BorderLayout.CENTER);
 		penController p = new penController(); // 캔버스 핸들러
-		canvas.addMouseMotionListener(p);
-		canvas.addMouseListener(p);
+		
+			canvas.addMouseMotionListener(p);
+			canvas.addMouseListener(p);
+		
 		
 		
 		
@@ -251,7 +253,7 @@ public class client extends JFrame implements ActionListener{
 		
 		JLabel stopwatch = new JLabel(new ImageIcon("image\\stopwatch.png"));
 		stopwatch.setOpaque(true);
-		label_timer = new JLabel("00 : 00");
+		label_timer = new JLabel("03 : 00");
 		label_timer.setHorizontalTextPosition(SwingConstants.CENTER);
 		label_timer.setHorizontalAlignment(SwingConstants.CENTER);
 		label_timer.setFont(new Font("나눔바른고딕", Font.PLAIN, 30));
@@ -550,6 +552,7 @@ public class client extends JFrame implements ActionListener{
 						playerIdx = msg.substring(msg.indexOf("#") + 1);
 						updateClientList();
 					}else if(msg.startsWith("_Start")){
+						vec.clear();
 						gameStart = true;
 						g = canvas.getGraphics(); // 캔버스 설정 초기화
 						g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -560,14 +563,18 @@ public class client extends JFrame implements ActionListener{
 						btn_ready.setEnabled(true);
 						JOptionPane.showMessageDialog(null, msg.substring(6), "                [Score Board]", JOptionPane.INFORMATION_MESSAGE);
 						drawer = false;
-					}else if(msg.equals("_GmEnd")){
+					}else if(msg.startsWith("_GmEnd")){
+						vec.clear();
+						//drawer = false;
 						bool = false;
 						//gameStart = false;
 						txt_field.setEnabled(true);
 						//btn_ready.setEnabled(true);
-						//label_timer.setText("00 : 00");
+						label_timer.setText("03 : 00");
+						
+						if(msg.substring(6,7).equals("1")) JOptionPane.showMessageDialog(null, "정답은 "+msg.substring(7), "아무도 못 맞혔습니다!", JOptionPane.INFORMATION_MESSAGE);
 						//bgm("_Stop"); // BGM 정지
-					if(drawer) {
+						if(drawer) {
 							
 							dos.writeUTF("regame");
 							dos.flush();
@@ -577,7 +584,7 @@ public class client extends JFrame implements ActionListener{
 					}else if(msg.startsWith("_RExam")){ // 명령어 : 문제 랜덤 출제
 						if(drawer){
 							JOptionPane.showMessageDialog(null,"단어 : " + msg.substring(6), "밑에 적힌 단어를 그려주세요.", JOptionPane.PLAIN_MESSAGE);
-							txt_area.append("단어 : "+msg.substring(6)+"\n");
+							txt_area.append("옆에 적힌 단어를 그려주세요! : "+msg.substring(6)+"\n");
 						}else{
 							JOptionPane.showMessageDialog(null, "답을 맞혀주세요.", "information", JOptionPane.PLAIN_MESSAGE);
 						}
@@ -589,6 +596,7 @@ public class client extends JFrame implements ActionListener{
 							txt_field.setEnabled(false);
 						}
 						else {
+							drawer = false;
 							txt_area.append("[" + msg.substring(6) + "님이 문제출제자 입니다!!]\n");
 						}
 					}else if(msg.startsWith("_Mouse")){ // 명령어 : 캔버스 공유
@@ -723,19 +731,27 @@ public class client extends JFrame implements ActionListener{
 	{	
 		int x1, x2, y1, y2;
 		public void mouseReleased(MouseEvent e) {
-			vec.clear();
-			repaint();
+			if(drawer) {
+				vec.clear();
+				repaint();	
+			}
+			
 		}
 		
 		public void mouseDragged(MouseEvent e){
-			vec.add(new Point(e.getX(),e.getY()));
-		    canvas.repaint();
+			if(drawer) {
+				vec.add(new Point(e.getX(),e.getY()));
+			    canvas.repaint();	
+			}
+			
 		}
 		public void mousePressed(MouseEvent e){
 			
+			if(drawer) {
+				vec.add(new Point(e.getX(),e.getY()));
+			    canvas.repaint();	
+			}
 			
-			vec.add(new Point(e.getX(),e.getY()));
-		    canvas.repaint();
 		}
 		public void mouseMoved(MouseEvent e){}
 		
