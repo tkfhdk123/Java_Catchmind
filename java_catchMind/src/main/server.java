@@ -107,23 +107,22 @@ public class server extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) { // '서버 시작 & 종료' 버튼
 		if (e.getSource() == serverstart_btn) {
-			new Thread(){
-				public void run(){
+			new Thread() {
+				public void run() {
 					try {
-				
-		
-				Collections.synchronizedMap(clientOutput);
-				ss = new ServerSocket(port);
-				serverstatus_label.setText("[ Server Started ]");
-				textarea.append("[ 서버가 시작되었습니다 ]" + "\n");
-				serverstart_btn.setEnabled(false);
-				serverclose_btn.setEnabled(true);
-				clientAccept();
-				}catch(IOException ie) {}	
-			}
+
+						Collections.synchronizedMap(clientOutput);
+						ss = new ServerSocket(port);
+						serverstatus_label.setText("[ Server Started ]");
+						textarea.append("[ 서버가 시작되었습니다 ]" + "\n");
+						serverstart_btn.setEnabled(false);
+						serverclose_btn.setEnabled(true);
+						clientAccept();
+					} catch (IOException ie) {
+					}
+				}
 			}.start();
-			
-			
+
 		} else if (e.getSource() == serverclose_btn) {
 			int select = JOptionPane.showConfirmDialog(null, "서버를 정말 종료하시겠습니까?", "JAVA CatchMind Server",
 					JOptionPane.OK_CANCEL_OPTION);
@@ -146,16 +145,17 @@ public class server extends JFrame implements ActionListener {
 				s = ss.accept();
 				if ((clientOutput.size()) + 1 > MAX_CLIENT || gamestart == true) {
 					s.close();
-					
+
 				} else {
-	
+
 					Thread cm = new clientManager(s);
 					cm.start();
 				}
-			} 
-	
-		}catch(IOException io) {}
-		
+			}
+
+		} catch (IOException io) {
+		}
+
 	}
 
 	public void serverMsg(String str) {
@@ -174,7 +174,8 @@ public class server extends JFrame implements ActionListener {
 		Socket soc;
 		DataInputStream dis;
 		DataOutputStream dos;
-	
+		Timer tm = new Timer();
+
 		public clientManager(Socket soc) {
 			this.soc = soc;
 			try {
@@ -189,14 +190,15 @@ public class server extends JFrame implements ActionListener {
 			try {
 
 				nickname = dis.readUTF();
-				if(!clientOutput.containsKey(nickname)) {
+				if (!clientOutput.containsKey(nickname)) {
 					clientOutput.put(nickname, dos);
 					clientScore.put(nickname, score);
-				}else if(clientOutput.containsKey(nickname)) {
+				} else if (clientOutput.containsKey(nickname)) {
 					JOptionPane.showMessageDialog(null, "중복된 닉네임이 있습니다. ", "ERROR", JOptionPane.ERROR_MESSAGE);
 					s.close();
 				}
-				serverMsg("========="+nickname + "님 입장!==============\n =======현재 플레이어 수 : " + clientOutput.size() + "/4"+"=======");
+				serverMsg("=========" + nickname + "님 입장!==============\n =======현재 플레이어 수 : " + clientOutput.size()
+						+ "/4" + "=======");
 				Iterator<String> it1 = clientOutput.keySet().iterator();
 
 				textarea.append("현재 접속자 수 : " + clientOutput.size() + "/4\n");
@@ -212,9 +214,9 @@ public class server extends JFrame implements ActionListener {
 				clientOutput.remove(nickname);
 				clientScore.remove(nickname);
 				Close();
-				serverMsg("======="+"현재 플레이어 수 : " + clientOutput.size() + "/4"+"=======\n");
+				serverMsg("=======" + "현재 플레이어 수 : " + clientOutput.size() + "/4" + "=======\n");
 				Iterator<String> it1 = clientOutput.keySet().iterator();
-				
+
 				textarea.append("현재 접속자 수 : " + clientOutput.size() + "/4\n");
 				scrollpane.getVerticalScrollBar().setValue(scrollpane.getVerticalScrollBar().getMaximum());
 
@@ -248,56 +250,57 @@ public class server extends JFrame implements ActionListener {
 		}
 
 		public void gameStart() {
-			
+
 			ArrayList<String> drawerList = new ArrayList<String>();
 			Iterator<String> it = clientOutput.keySet().iterator();
 
 			while (it.hasNext())
 				drawerList.add(it.next());
-			if (drawer > clientOutput.size()-1) {
+			if (drawer > clientOutput.size() - 1) {
 				drawer = 0;
 			}
 			serverMsg("_Drwer" + drawerList.get(drawer++));
 
 			Quiz quiz = new Quiz();
 			quiz.start(); // 문제 출제
-			//Timer tm = new Timer();
-			//tm.start(); // 타이머 시작
+			tm = new Timer();
+			tm.start();
 			gamestart = true;
-			serverMsg("_Round"+(gameNum+1));
+			serverMsg("_Round" + (gameNum + 1));
 			serverMsg("_Start"); // 명령어 : 게임 시작
-			
 
 		}
 
 		public void command(String str) {
 			String cmd = str.substring(0, 6);
-			
+
 			if (cmd.contentEquals("_Chat ")) {
 				check(str.substring(6).trim());
 				serverMsg(str.substring(6));
 			} else if (cmd.equals("_Ready")) { // 명령어 : 클라이언트 준비
-				
-				if(setEnd) {
+
+				if (setEnd) {
 					readyPlayer = 0;
 					gameNum = 0;
 					setEnd = false;
 					Iterator<String> it1 = clientScore.keySet().iterator();
-					while(it1.hasNext())
+					while (it1.hasNext())
 						clientScore.put(it1.next(), 0);
-					
+
 					clientSet();
 				}
 				readyPlayer++;
 				if (readyPlayer >= 2 && readyPlayer == clientOutput.size()) {
-					serverMsg("===="+"모든 참여자들이 준비되었습니다."+"====");
+					serverMsg("====" + "모든 참여자들이 준비되었습니다." + "====");
 					for (int i = 3; i > 0; i--) {
 						try {
-							serverMsg("======"+ i + "초 후 게임을 시작합니다 "+"======");
+							serverMsg("======" + i + "초 후 게임을 시작합니다 " + "======");
 							Thread.sleep(1000);
-						} catch (InterruptedException ie) {}
-				}
-				if(gameNum==0) gameStart();
+						} catch (InterruptedException ie) {
+						}
+					}
+					if (gameNum == 0)
+						gameStart();
 
 				}
 			} else if (cmd.equals("_Mouse")) { // 명령어 : 마우스 좌표 수신
@@ -311,37 +314,34 @@ public class server extends JFrame implements ActionListener {
 				serverMsg(str);
 			} else if (cmd.equals("_GmEnd")) { // 명령어 : 게임 종료 (시간 초과나 이탈자 발생으로 게임이 종료되는 경우)
 
-					
-			} 
-			
-			else if(cmd.equals("regame")) {
-			
-			
-				
-				if(gameNum++<2&&!once) {
+			}
+
+			else if (cmd.equals("regame")) {
+
+				tm.interrupt();
+
+				if (gameNum++ < 2 && !once) {
 					once = true;
 					gameStart();
-					serverMsg("======"+"다음 게임이 곧 시작됩니다."+"======\n");
-					
-					
-				}
-				else {
+					serverMsg("======" + "다음 게임이 곧 시작됩니다." + "======\n");
+
+				} else {
 					setEnd = true;
-					serverMsg("======"+"세트가 종료되었습니다 !"+"======\n");
-					
-					List<Map.Entry<String,Integer>> list = new LinkedList<>(clientScore.entrySet());
-					
-					Collections.sort(list, new Comparator<Map.Entry<String, Integer>>(){
-						public int compare(Map.Entry<String,Integer>o1, Map.Entry<String, Integer>o2) {
-							int comparision = (o1.getValue() - o2.getValue())*-1;
-							return comparision == 0? o1.getKey().compareTo(o2.getKey()):comparision;
+					serverMsg("======" + "세트가 종료되었습니다 !" + "======\n");
+
+					List<Map.Entry<String, Integer>> list = new LinkedList<>(clientScore.entrySet());
+
+					Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+						public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+							int comparision = (o1.getValue() - o2.getValue()) * -1;
+							return comparision == 0 ? o1.getKey().compareTo(o2.getKey()) : comparision;
 						}
 					});
-					
-					Map<String,Integer> sortedMap = new LinkedHashMap<>();
-					for(Iterator<Map.Entry<String, Integer>> iter = list.iterator(); iter.hasNext();) {
+
+					Map<String, Integer> sortedMap = new LinkedHashMap<>();
+					for (Iterator<Map.Entry<String, Integer>> iter = list.iterator(); iter.hasNext();) {
 						Map.Entry<String, Integer> entry = iter.next();
-						sortedMap.put(entry.getKey(),entry.getValue());
+						sortedMap.put(entry.getKey(), entry.getValue());
 					}
 					String[] nicks = new String[4];
 					int[] scores = new int[4];
@@ -350,12 +350,13 @@ public class server extends JFrame implements ActionListener {
 						nicks[idx] = mapEntry.getKey();
 						scores[idx++] = mapEntry.getValue();
 					}
-					String result =""; 
-					for(idx = 0; idx<4; idx++) {
-						if(nicks[idx]==null) break;
-						result +=(idx+1) + "등 : "+nicks[idx] +" ("+scores[idx]+")\n";
+					String result = "";
+					for (idx = 0; idx < 4; idx++) {
+						if (nicks[idx] == null)
+							break;
+						result += (idx + 1) + "등 : " + nicks[idx] + " (" + scores[idx] + ")\n";
 					}
-					serverMsg("_StEnd"+result);
+					serverMsg("_StEnd" + result);
 					gamestart = false;
 //					clientAccept();
 //					clientSet();
@@ -363,17 +364,19 @@ public class server extends JFrame implements ActionListener {
 				}
 			}
 		}
-		
+
 		public void check(String str) { // 정답 체크
 			String nickname = str.substring(0, str.indexOf(" ")); // 정답을 말한 클라이언트의 닉네임
 			String ans = str.substring(str.lastIndexOf(" ") + 1); // 정답 내용
 
 			if (ans.equals(sentence)) {
-				serverMsg("======"+nickname + " 님이 맞혔습니다!"+"===========\n ===========정답은 ["+sentence+"]!!!!===========");
+				serverMsg("======" + nickname + " 님이 맞혔습니다!" + "===========\n ===========정답은 [" + sentence
+						+ "]!!!!===========");
 				clientScore.put(nickname, clientScore.get(nickname) + 1); // 정답자 점수 추가
 				clientSet();
 				once = false;
-				serverMsg("_GmEnd");
+				gamestart = false;
+				serverMsg("_GmEnd"+"");
 			}
 		}
 	}
@@ -392,47 +395,51 @@ public class server extends JFrame implements ActionListener {
 					sentence = br.readLine();
 				}
 				serverMsg("_RExam" + sentence);
-			} catch (IOException ie) {}
+			} catch (IOException ie) {
+			}
 		}
 	}
 
-//	class Timer extends Thread {
-//		int second = 59; 
-//		int minute = 2;
-//		String time = minute+":"+second;
-//		public void run() {
-//			while(minute>0) {
-//				try {
-//					sleep(1000);
-//					
-//					if(second ==0) {
-//						second = 59;
-//						minute==;
-//					}
-//					
-//					second ==;
-//					
-//				} catch (Exception e) {}
-//	
-//			}
-//		}
-//
-//		
-//	}
+	class Timer extends Thread {
+		int currentTime = 0;
+
+		public void run() {
+			try {
+				while (gamestart == true) {
+					sleep(1000);
+					currentTime++;
+					serverMsg("_Timer" + toTime(currentTime));
+					if (currentTime>179) {
+						gamestart = false;
+						serverMsg("=========정답은 [" + sentence+"]!!!!=============\n");
+						serverMsg("_GmEnd"+"1"+sentence);
+						
+						break;
+					}
+
+				}
+			} catch (Exception e) {}
+		}
+
+		String toTime(int time) {
+			int m = time / 60;
+			int s = time - 60 * m;
+			return String.format("%02d : %02d", 2 - m, 60 - s);
+		}
+	}
 
 	public static void main(String[] args) {
-      EventQueue.invokeLater(new Runnable() {
-         public void run() {
-            try {
-               server sv = new server();
-               sv.init();
-               sv.setVisible(true);
-             
-            }
-            catch(Exception e) {
-               e.printStackTrace();
-            }
-         }
-      });
-   }
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					server sv = new server();
+					sv.init();
+					sv.setVisible(true);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 }
