@@ -436,6 +436,7 @@ public class server extends JFrame implements ActionListener {
 						else serverMsg("_Timer" + toTime(currentTime));
 						if (currentTime > 179) {
 							gamestart = false;
+							currentTime = 0;
 							serverMsg("=========정답은 [" + sentence + "]!!!!=============\n");
 							serverMsg("_GmEnd" + "1" + sentence);
 						}
@@ -446,11 +447,10 @@ public class server extends JFrame implements ActionListener {
 		}
 
 		String toTime(int time) {
-			int m = time / 60;
-			int s = time - 60 * m;
-			if(s >= 60) {
-				m++; s = 0;
-			}
+			int m,s;
+			if(time % 60 == 0) {	m = time/60 - 1;	s = 60;	} 
+			else {	m = time / 60;	s = time - 60 * m;}
+			
 			return String.format("%02d : %02d", 2 - m, 60 - s);
 		}
 	}
